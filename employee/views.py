@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status,generics
 from django.db import transaction
-from .serializers import EmployeeProfileSerializer,EmployeeCreateSerializer,EmployeeUpdateSerializer
+from .serializers import EmployeeProfileSerializer,EmployeeCreateSerializer,EmployeeUpdateSerializer,DepartmentSerializer
 from users.models import User
 from users.permissions import IsHRAdmin
 from rest_framework.permissions import IsAuthenticated
@@ -55,4 +55,13 @@ class EmployeeDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
     return EmployeeProfileSerializer
 
 
-    
+class DepartmentListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, IsHRAdmin]
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+
+class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsHRAdmin]
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer

@@ -7,5 +7,15 @@ urlpatterns = [
         "v1/records/<int:pk>/",
         views.EmployeeDetailUpdateView.as_view(),
         name="employee-detail-update",
-    )
+    ),
+    path(
+        'v1/departments/',
+        views.DepartmentListCreateView.as_view(),
+        name='department-list-create'
+    ),
+    path(
+        'v1/departments/<int:pk>/',
+        views.DepartmentDetailView.as_view(),
+        name='department-detail'
+    ),
 ]
