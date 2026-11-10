@@ -2,9 +2,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,generics
 from django.db import transaction
-from .serializers import EmployeeProfileSerializer,EmployeeCreateSerializer
+from .serializers import EmployeeProfileSerializer,EmployeeCreateSerializer,EmployeeUpdateSerializer
 from users.models import User
 from users.permissions import IsHRAdmin
 from rest_framework.permissions import IsAuthenticated
@@ -51,3 +51,15 @@ class EmployeeCreateView(APIView):
         status=status.HTTP_201_CREATED,
     )
     
+class EmployeeDetailUpdateView(generics.RetrieveUpdateAPIView):
+  permission_classes = [IsAuthenticated, IsHRAdmin]
+  queryset = Employee.objects.all()
+  serializer_class = (
+      EmployeeProfileSerializer  # Used for GET (retrieving the full profile)
+  )
+
+  def get_serializer_class(self):
+    # Use EmployeeUpdateSerializer for PATCH/PUT, and ProfileSerializer for GET
+    if self.request.method in ["PUT", "PATCH"]:
+      return EmployeeUpdateSerializer
+    return EmployeeProfileSerializer

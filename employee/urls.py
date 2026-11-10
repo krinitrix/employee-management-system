@@ -3,4 +3,9 @@ from django.urls import path
 from . import views
 urlpatterns = [
     path('v1/records/',views.EmployeeCreateView.as_view()),
+    path(
+        "v1/records/<int:pk>/",
+        views.EmployeeDetailUpdateView.as_view(),
+        name="employee-detail-update",
+    )
 ]

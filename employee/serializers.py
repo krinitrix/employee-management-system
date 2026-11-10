@@ -54,3 +54,34 @@ class EmployeeCreateSerializer(serializers.Serializer):
     if value and not Department.objects.filter(id=value).exists():
       raise serializers.ValidationError("Department with this ID does not exist.")
     return value
+  
+
+
+
+class EmployeeUpdateSerializer(serializers.ModelSerializer):
+  department_id = serializers.IntegerField(
+      required=False, allow_null=True
+  )  
+
+  class Meta:
+    model = Employee  
+    fields = ["department_id", "employment_type", "base_salary"]
+
+  def validate_department_id(self, value):
+    if value and not Department.objects.filter(id=value).exists():
+      raise serializers.ValidationError("Department with this ID does not exist.")
+    return value
+
+  def update(self, instance, validated_data):
+    
+    department_id = validated_data.pop("department_id", None)
+    if department_id is not None:
+      if department_id:
+        instance.department = Department.objects.get(id=department_id)
+      else:
+        instance.department = None  
+    
+    for attr, value in validated_data.items():
+      setattr(instance, attr, value)
+    instance.save()
+    return instance
