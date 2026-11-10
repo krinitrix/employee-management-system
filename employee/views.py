@@ -38,15 +38,21 @@ class EmployeeListCreateView(generics.ListCreateAPIView):
         status=status.HTTP_201_CREATED,
     )
     
-class EmployeeDetailUpdateView(generics.RetrieveUpdateAPIView):
+class EmployeeDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
   permission_classes = [IsAuthenticated, IsHRAdmin]
   queryset = Employee.objects.all()
   serializer_class = (
       EmployeeProfileSerializer  
   )
+  def perform_destroy(self, instance):
+        instance.user.delete()
+        Response({"message":"Record Deleted"},status=status.HTTP_202_ACCEPTED)
 
   def get_serializer_class(self):
     
     if self.request.method in ["PUT", "PATCH"]:
       return EmployeeUpdateSerializer
     return EmployeeProfileSerializer
+
+
+    
