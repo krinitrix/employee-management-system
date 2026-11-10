@@ -1,5 +1,7 @@
+#employee/serializers.py
+
 from rest_framework import serializers
-from .models import Department, EmployeeProfile
+from .models import Department, Employee
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
@@ -17,7 +19,7 @@ class EmployeeProfileSerializer(serializers.ModelSerializer):
   role = serializers.CharField(source="user.role", read_only=True)
 
   class Meta:
-    model = EmployeeProfile
+    model = Employee
     fields = [
         "id",
         "username",

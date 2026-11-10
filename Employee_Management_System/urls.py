@@ -1,3 +1,4 @@
+#Employee_Management_System/urls.py <main app>
 """
 URL configuration for Employee_Management_System project.
 
@@ -19,5 +20,6 @@ from django.urls import path,include
 # from users import urls
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/users/',include('users.urls'))
+    path('api/users/',include('users.urls')),
+    path('api/employee/',include('employee.urls'))
 ]
