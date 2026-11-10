@@ -1,5 +1,5 @@
 
-
+from django.db import transaction
 from rest_framework import serializers
 from .models import Department, Employee
 from users.models import User
@@ -54,6 +54,31 @@ class EmployeeCreateSerializer(serializers.Serializer):
     if value and not Department.objects.filter(id=value).exists():
       raise serializers.ValidationError("Department with this ID does not exist.")
     return value
+  
+  def create(self, validated_data):
+    user_data = validated_data.pop("user")
+    department_id = validated_data.pop("department_id", None)
+
+    department = None
+    if department_id:
+      department = Department.objects.get(id=department_id)
+
+    # Wrap in an atomic transaction to ensure User and Employee are created together safely
+    with transaction.atomic():
+      # 1. Create the user using Django's secure create_user helper
+      user = User.objects.create_user(
+          username=user_data["username"],
+          email=user_data["email"],
+          password=user_data["password"],
+          role=user_data.get("role", User.Role.EMPLOYEE),
+      )
+
+      # 2. Create the employee record linked to that user
+      employee = Employee.objects.create(
+          user=user, department=department, **validated_data
+      )
+
+    return employee
   
 
 

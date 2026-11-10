@@ -11,41 +11,28 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Employee,Department
 
 
-class EmployeeCreateView(APIView):
-    permission_classes = [IsAuthenticated, IsHRAdmin]
+class EmployeeListCreateView(generics.ListCreateAPIView):
+  permission_classes = [IsAuthenticated, IsHRAdmin]
+  queryset = Employee.objects.all().select_related("user", "department")
 
-    @transaction.atomic
-    def post(self, request):
-        # 1. Validate request
-        serializer = EmployeeCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
+  def get_serializer_class(self):
+    
+    if self.request.method == "POST":
+      return EmployeeCreateSerializer
+    return EmployeeProfileSerializer
 
-        user_data = validated_data.pop("user")
-        department_id = validated_data.pop("department_id", None)
 
-        user = User.objects.create_user(
-        username=user_data["username"],
-        email=user_data["email"],
-        password=user_data["password"],
-        role=user_data.get("role"),)
-        
-        
-        department = None
-        if department_id :
-            department = Department.objects.get(id=department_id)
-        
-        employee = Employee.objects.create(
-        user=user,
-        department=department,
-        employment_type=validated_data.get("employment_type", "FULL_TIME"),
-        base_salary=validated_data.get("base_salary", 0.00),
-    )
-        
-        response_serializer =EmployeeProfileSerializer(employee)
-        return Response(
+  def create(self, request, *args, **kwargs):
+    serializer = self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    
+    employee = serializer.save()  
+
+    response_serializer = EmployeeProfileSerializer(employee)
+    return Response(
         {
-            "message": "Employee profile created.",
+            "message": "Employee profile created successfully.",
             "data": response_serializer.data,
         },
         status=status.HTTP_201_CREATED,
@@ -55,11 +42,11 @@ class EmployeeDetailUpdateView(generics.RetrieveUpdateAPIView):
   permission_classes = [IsAuthenticated, IsHRAdmin]
   queryset = Employee.objects.all()
   serializer_class = (
-      EmployeeProfileSerializer  # Used for GET (retrieving the full profile)
+      EmployeeProfileSerializer  
   )
 
   def get_serializer_class(self):
-    # Use EmployeeUpdateSerializer for PATCH/PUT, and ProfileSerializer for GET
+    
     if self.request.method in ["PUT", "PATCH"]:
       return EmployeeUpdateSerializer
     return EmployeeProfileSerializer
