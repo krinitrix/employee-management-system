@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from .serializers import EmployeeProfileSerializer
+from .serializers import EmployeeProfileSerializer,EmployeeCreateSerializer
 from users.models import User
 from users.permissions import IsHRAdmin
 from rest_framework.permissions import IsAuthenticated
@@ -17,7 +17,7 @@ class EmployeeCreateView(APIView):
     @transaction.atomic
     def post(self, request):
         # 1. Validate request
-        serializer = EmployeeProfileSerializer(data=request.data)
+        serializer = EmployeeCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
@@ -35,16 +35,18 @@ class EmployeeCreateView(APIView):
         if department_id :
             department = Department.objects.get(id=department_id)
         
-        profile = Employee.objects.create(
+        employee = Employee.objects.create(
         user=user,
         department=department,
         employment_type=validated_data.get("employment_type", "FULL_TIME"),
         base_salary=validated_data.get("base_salary", 0.00),
     )
+        
+        response_serializer =EmployeeProfileSerializer(employee)
         return Response(
         {
-            "message": "Employee profile created (Monolithic View).",
-            "employee_id": profile.id,
+            "message": "Employee profile created.",
+            "data": response_serializer.data,
         },
         status=status.HTTP_201_CREATED,
     )
