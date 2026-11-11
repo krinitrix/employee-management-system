@@ -18,4 +18,5 @@ urlpatterns = [
         views.DepartmentDetailView.as_view(),
         name='department-detail'
     ),
+    path('v1/me/',views.MyEmployeeProfileView.as_view(),name='my-employee-profile'),
 ]

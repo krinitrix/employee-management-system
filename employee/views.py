@@ -9,7 +9,7 @@ from users.models import User
 from users.permissions import IsHRAdmin
 from rest_framework.permissions import IsAuthenticated
 from .models import Employee,Department
-
+from django.shortcuts import get_object_or_404
 
 class EmployeeListCreateView(generics.ListCreateAPIView):
   permission_classes = [IsAuthenticated, IsHRAdmin]
