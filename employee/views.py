@@ -46,7 +46,7 @@ class EmployeeDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
   )
   def perform_destroy(self, instance):
         instance.user.delete()
-        Response({"message":"Record Deleted"},status=status.HTTP_202_ACCEPTED)
+        
 
   def get_serializer_class(self):
     

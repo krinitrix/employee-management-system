@@ -99,12 +99,12 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
 
   def update(self, instance, validated_data):
     
-    department_id = validated_data.pop("department_id", None)
-    if department_id is not None:
-      if department_id:
-        instance.department = Department.objects.get(id=department_id)
+    if "department_id" in validated_data:
+      department_id = validated_data.pop("department_id")
+      if department_id is None:
+        instance.department = None
       else:
-        instance.department = None  
+        instance.department = Department.objects.get(id=department_id)
     
     for attr, value in validated_data.items():
       setattr(instance, attr, value)
