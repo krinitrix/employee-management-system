@@ -65,3 +65,14 @@ class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsHRAdmin]
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+    
+
+class MyEmployeeProfileView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = EmployeeProfileSerializer
+
+    def get_object(self):
+        return get_object_or_404(
+            Employee.objects.select_related("user", "department"),
+            user=self.request.user
+        )
